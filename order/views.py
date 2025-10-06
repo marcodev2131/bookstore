@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Sum
 from decimal import Decimal
+from bookstore.pagination import MediumResultsSetPagination, SmallResultsSetPagination
 from .models import Order, OrderItem
 from .serializers import (
     OrderSerializer, OrderDetailSerializer, OrderCreateSerializer,
@@ -24,6 +25,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     - DELETE /orders/{id}/ - Cancela pedido (apenas se pending)
     """
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = MediumResultsSetPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'created_at']
     search_fields = ['shipping_address']
@@ -155,6 +157,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     queryset = OrderItem.objects.select_related('order', 'product').all()
     serializer_class = OrderItemSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = SmallResultsSetPagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['order', 'product']
     ordering_fields = ['created_at', 'quantity', 'unit_price']

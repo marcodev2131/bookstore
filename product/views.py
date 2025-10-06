@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
+from bookstore.pagination import SmallResultsSetPagination, MediumResultsSetPagination
 from .models import Category, Product
 from .serializers import (
     CategorySerializer, ProductSerializer, 
@@ -26,6 +27,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = SmallResultsSetPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['name']
     search_fields = ['name', 'description']
@@ -68,6 +70,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     """
     queryset = Product.objects.select_related('category').all()
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = MediumResultsSetPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'is_active', 'stock_quantity']
     search_fields = ['title', 'author', 'isbn', 'description']
