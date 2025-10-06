@@ -15,8 +15,28 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.conf import settings
+from rest_framework.routers import DefaultRouter
+from product.views import CategoryViewSet, ProductViewSet
+from order.views import OrderViewSet, OrderItemViewSet
+
+# Cria o router principal da API
+api_router = DefaultRouter()
+api_router.register(r'categories', CategoryViewSet, basename='category')
+api_router.register(r'products', ProductViewSet, basename='product')
+api_router.register(r'orders', OrderViewSet, basename='order')
+api_router.register(r'order-items', OrderItemViewSet, basename='orderitem')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include(api_router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
+
+# Adicionar URLs do Debug Toolbar apenas em desenvolvimento
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
